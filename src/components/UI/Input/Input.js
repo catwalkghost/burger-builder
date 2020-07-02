@@ -29,13 +29,16 @@ const input = (props) => {
                     className='input-element'
                     value={value}
                     onChange={changed}>
-                    {elementConfig.options.map(option => (
-                        <option
-                            key={option.value}
-                            value={option.value}>
-                            {option.display}
-                        </option>
-                    ))}
+                    {elementConfig.options.map(option => {
+                        const { display, value } = option
+                        return (
+                            <option
+                                key={value}
+                                value={value}>
+                                {display}
+                            </option>
+                        )
+                    })}
                  </select>
             )
             break

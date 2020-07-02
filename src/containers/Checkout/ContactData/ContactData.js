@@ -16,40 +16,40 @@ class ContactData extends Component {
                elementConfig: {
                    type: 'text',
                    placeholder: 'Name',
-                   value: '',
-               }
+               },
+               value: '',
            },
            email: {
                elementType: 'input',
                elementConfig: {
                    type: 'email',
                    placeholder: 'Email',
-                   value: '',
-               }
+               },
+               value: '',
            },
            street: {
                elementType: 'input',
                elementConfig: {
                    type: 'text',
                    placeholder: 'Street Address',
-                   value: '',
-               }
+               },
+               value: '',
            },
            postCode: {
                elementType: 'input',
                elementConfig: {
                    type: 'text',
                    placeholder: 'Post Code',
-                   value: '',
-               }
+               },
+               value: '',
            },
            country:  {
                elementType: 'input',
                elementConfig: {
                    type: 'text',
                    placeholder: 'Name',
-                   value: '',
-               }
+               },
+               value: '',
            },
            deliveryMethod: {
                 elementType: 'select',
@@ -93,8 +93,9 @@ class ContactData extends Component {
     }
 
     inputChangedHandler = (e, inputId) => {
+
+        // console.log(e.target.value)
         const { orderForm } = this.state
-        console.log(e.target.value)
         const updatedOrderForm = {
             ...orderForm
         }
@@ -134,7 +135,7 @@ class ContactData extends Component {
                                         elementType={elementType}
                                         elementConfig={elementConfig}
                                         value={value}
-                                        changed={() => this.inputChangedHandler(id)} />
+                                        changed={(e) => this.inputChangedHandler(e, id)} />
                                 )
                             })
                         }
