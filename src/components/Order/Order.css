@@ -1,0 +1,9 @@
+.order {
+    width: 100%;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    padding: 1rem;
+    margin: 1rem 0;
+    box-sizing: border-box;
+}
+
