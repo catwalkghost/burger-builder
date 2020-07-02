@@ -6,7 +6,7 @@ import NavigationItem from './NavigationItem/NavigationItem'
 
 const navigationItems = (props) => (
     <ul className='navigation-items'>
-        <NavigationItem url='/'>
+        <NavigationItem url='/' exact >
             Builder
         </NavigationItem>
         <NavigationItem url='/my-orders'>

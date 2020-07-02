@@ -7,3 +7,24 @@
     box-sizing: border-box;
 }
 
+.order-items {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.order-item {
+    text-transform: capitalize;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 0 .5rem;
+    border: 1px solid #ccc;
+    padding: .5rem;
+
+}
+
+.order-item-highlighted {
+    font-weight: bold;
+}
+
