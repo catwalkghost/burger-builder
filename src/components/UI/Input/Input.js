@@ -3,14 +3,27 @@ import './Input.css'
 
 const input = (props) => {
 
-    const { label, tag, elementType, elementConfig, value, changed } = props
+    const { label, elementType, elementConfig, value, changed, notValid, shouldValidate, touched } = props
     let inputElement = null
+    const inputClasses = ['input-element']
+
+    if (notValid && shouldValidate && touched) {
+        inputClasses.push('not-valid')
+    }
+
+    const cls = inputClasses.join(' ')
+
+    // Adding validation error messages
+    let validationError = null
+    if (touched && notValid) {
+        validationError = <p>Please Enter a Valid Value</p>
+    }
 
     switch (elementType) {
         case ('input'):
             inputElement =
                 <input
-                    className='input-element'
+                    className={cls}
                     {...elementConfig}
                     value={value}
                     onChange={changed} />
@@ -18,7 +31,7 @@ const input = (props) => {
         case ('textarea'):
             inputElement =
                 <textarea
-                    className='input-element'
+                    className={cls}
                     {...elementConfig}
                     value={value}
                     onChange={changed} />
@@ -26,7 +39,7 @@ const input = (props) => {
         case ('select'):
             inputElement = (
                 <select
-                    className='input-element'
+                    className={cls}
                     value={value}
                     onChange={changed}>
                     {elementConfig.options.map(option => {
@@ -45,7 +58,7 @@ const input = (props) => {
         default:
             inputElement =
                 <input
-                    className='input-element'
+                    className={cls}
                     {...elementConfig}
                     value={value}
                     onChange={changed} />

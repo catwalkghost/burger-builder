@@ -8,6 +8,13 @@
     box-sizing: border-box;
 }
 
+.form {
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+}
+
 @media (min-width: 600px) {
     .contact-data {
         width: 500px;

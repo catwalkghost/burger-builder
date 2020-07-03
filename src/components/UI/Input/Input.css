@@ -26,3 +26,8 @@
     background-color: #fff;
     border: 1px solid #40A4c8;
 }
+
+.not-valid {
+    border: 1px solid #bf3813;
+    background-color: #fda49a;
+}
