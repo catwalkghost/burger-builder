@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import { connect } from 'react-redux'
+
 import './ContactData.css'
 
 import api from '../../../api-orders'
@@ -101,7 +103,7 @@ class ContactData extends Component {
     orderHandler = (e) => {
         e.preventDefault()
 
-        const { props: { ingredients, price, history }, state: { orderForm } } = this
+        const { props: { reduxIngredients, reduxPrice, history }, state: { orderForm } } = this
 
         const formData = {}
         for (let formElId in orderForm ) {
@@ -114,8 +116,8 @@ class ContactData extends Component {
         })
         // alert('Checkout')
         const order = {
-            ingredients,
-            price: price,
+            ingredients: reduxIngredients,
+            price: reduxPrice,
             orderData: formData,
         }
         api.post('/orders.json', order)
@@ -128,7 +130,7 @@ class ContactData extends Component {
                 console.log(err)
                 this.setState({loading: false })
             })
-        console.log(ingredients)
+        // console.log(ingredients)
     }
 
     inputChangedHandler = (e, inputId) => {
@@ -234,4 +236,11 @@ class ContactData extends Component {
 
 }
 
-export default ContactData
+const mapStateToProps = state => {
+    return {
+        reduxPrice: state.totalPrice,
+        reduxIngredients: state.ingredients,
+    }
+}
+
+export default connect(mapStateToProps)(ContactData)
