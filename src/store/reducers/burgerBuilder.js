@@ -1,13 +1,9 @@
-import * as at from './actions'
+import * as actionTypes from '../actions/actionTypes'
 
 const initialState = {
-    ingredients: {
-        salad: 0,
-        bacon: 0,
-        cheese: 0,
-        meat: 0,
-    },
+    ingredients: null,
     totalPrice: 0.99,
+    error: false,
 }
 
 const INGREDIENT_PRICES = {
@@ -19,7 +15,7 @@ const INGREDIENT_PRICES = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case at.ADD_INGREDIENT:
+        case actionTypes.ADD_INGREDIENT:
             return {
                 ...state,
                 ingredients: {
@@ -29,7 +25,7 @@ const reducer = (state = initialState, action) => {
                 totalPrice: state.totalPrice + INGREDIENT_PRICES[action.payload.name]
             }
 
-        case at.REMOVE_INGREDIENT:
+        case actionTypes.REMOVE_INGREDIENT:
             return {
                 ...state,
                 ingredients: {
@@ -37,6 +33,19 @@ const reducer = (state = initialState, action) => {
                     [action.payload.name]: state.ingredients[action.payload.name] - 1 // ES6 Syntax
                 },
                 totalPrice: state.totalPrice - INGREDIENT_PRICES[action.payload.name]
+            }
+
+        case actionTypes.SET_INGREDIENTS:
+            return {
+                ...state,
+                ingredients: action.ings,
+                error: false // in case of successful refetch
+            }
+
+        case actionTypes.SET_ERROR:
+            return {
+                ...state,
+                error: true,
             }
 
         default:

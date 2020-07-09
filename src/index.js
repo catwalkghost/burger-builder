@@ -1,17 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { createStore } from 'redux'
+import { applyMiddleware, createStore, compose } from 'redux'
 import { Provider } from 'react-redux'
 import {BrowserRouter} from 'react-router-dom'
+import thunk from 'redux-thunk'
+
 
 import './index.css'
 import App from './App'
 
-import reducer from './store/reducer'
+import burgerBuilder from './store/reducers/burgerBuilder'
+import reducer from './store/reducers/reducer'
 import * as serviceWorker from './serviceWorker'
 
-const store = createStore(reducer)
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+// const devTools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+const store = createStore(burgerBuilder, composeEnhancers(applyMiddleware(thunk)))
 
 const appWithRouting = (
     <Provider store={store}>

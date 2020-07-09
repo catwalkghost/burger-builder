@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
 import { connect } from 'react-redux'
-import * as at from '../../store/actions'
+import * as actionTypes from '../../store/actions/actionTypes'
+import * as burgerBuilderActions from '../../store/actions/'
+
+import api from '../../api-orders'
 
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import Aux from '../../hoc/Aux/Aux'
-import api from '../../api-orders'
 
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
@@ -17,7 +19,6 @@ class BurgerBuilder extends Component {
     state = {
         loading: false,
         purchasing: false,
-        error: false,
     }
 
     setPurchasable = () => {
@@ -77,21 +78,23 @@ class BurgerBuilder extends Component {
         history.push('/checkout')
     }
 
-    // componentDidMount () {
-    //     api.get('/ingredients.json ')
-    //         .then(resp => {
-    //                 const { data } = resp
-    //                 this.setState({ ingredients: data})
-    //             }
-    //         )
-    //         .catch(err => {
-    //             this.setState({error: true})
-    //         })
-    // }
+    componentDidMount () {
+        // api.get('/ingredients.json ')
+        //     .then(resp => {
+        //             const { data } = resp
+        //             this.setState({ ingredients: data})
+        //         }
+        //     )
+        //     .catch(err => {
+        //         this.setState({error: true})
+        //     })
+        const { onInitIngredients } = this.props
+        onInitIngredients()
+    }
 
     render () {
         const { purchasing, loading } = this.state
-        const { reduxIngredients, reduxPrice } = this.props
+        const { reduxIngredients, reduxPrice, error } = this.props
 
         const disabledInfo = {
             ...reduxIngredients
@@ -113,7 +116,7 @@ class BurgerBuilder extends Component {
 
         }
 
-        let burger = this.state.error ? <p>Ingredients can't be loaded</p> : <Spinner />
+        let burger = error ? <p>Ingredients can't be loaded</p> : <Spinner />
 
         if (reduxIngredients) {
             burger = (
@@ -145,26 +148,35 @@ const mapStateToProps = state => {
     return {
         reduxIngredients: state.ingredients,
         reduxPrice: state.totalPrice,
+        reduxError: state.error,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAddIngredient: (ingName) => dispatch({
-            type: at.ADD_INGREDIENT,
-            payload: {
-                name: ingName,
-            }
-        }),
-
-        onRemoveIngredient: (ingName) => dispatch({
-            type: at.REMOVE_INGREDIENT,
-            payload: {
-                name: ingName,
-            }
-        })
+        onAddIngredient: (ingName) => dispatch(burgerBuilderActions.addIngredient(ingName)),
+        onRemoveIngredient: (ingName) => dispatch(burgerBuilderActions.removeIngredient(ingName)),
+        onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients())
     }
 }
+
+// const mapDispatchToProps = dispatch => {
+//     return {
+//         onAddIngredient: (ingName) => dispatch({
+//             type: actionTypes.ADD_INGREDIENT,
+//             payload: {
+//                 name: ingName,
+//             }
+//         }),
+//
+//         onRemoveIngredient: (ingName) => dispatch({
+//             type: actionTypes.REMOVE_INGREDIENT,
+//             payload: {
+//                 name: ingName,
+//             }
+//         })
+//     }
+// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, api))
 
