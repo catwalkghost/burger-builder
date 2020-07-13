@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 
@@ -7,12 +7,6 @@ import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSumm
 import ContactData from './ContactData/ContactData'
 
 class Checkout extends Component {
-
-    // Temp dummy state to fill ingredients
-    // state = {
-    //     ingredients: null,
-    //     totalPrice: 0,
-    // }
 
     checkoutCancelledHandler = () => {
         const { history } = this.props
@@ -24,54 +18,40 @@ class Checkout extends Component {
         history.replace('/checkout/contact-data')
     }
 
-    // componentWillMount() {
-    //     const { location } = this.props
-    //     const query = new URLSearchParams(location.search)
-    //     const burgerIngredients = {}
-    //     let price = 0
-    //     for (let param of query.entries()) {
-    //         // ['salad' : 1]
-    //         if (param[0] === 'price') {
-    //             price = param[1]
-    //         } else {
-    //             burgerIngredients[param[0]] = +param[1]
-    //         }
-    //
-    //     }
-    //     this.setState({
-    //         ingredients: burgerIngredients,
-    //         totalPrice: price,
-    //     })
-    // }
-
     render () {
-        const {
-            props: {
-                match,
-                reduxIngredients,
-            },
-        } = this
+        const {reduxIngredients, match, isComplete } = this.props
 
-        return (
-            <div>
-                <CheckoutSummary
-                    burgerIngredients={reduxIngredients}
-                    checkoutCancelled={this.checkoutCancelledHandler}
-                    checkoutContinued={this.checkoutContinuedHandler} />
-                <Route
-                    path={match.url + '/contact-data'} component={ContactData} />
-            </div>
-        )
+        let summary = <Redirect to='/'/>
+
+        if (reduxIngredients) {
+            const onSuccessRedirect =
+                isComplete ? <Redirect to='/' /> : null
+
+            summary = (
+                <div>
+                    {onSuccessRedirect}
+                    <CheckoutSummary
+                        burgerIngredients={reduxIngredients}
+                        checkoutCancelled={this.checkoutCancelledHandler}
+                        checkoutContinued={this.checkoutContinuedHandler}/>
+
+                    <Route
+                        path={match.path + '/contact-data'}
+                        component={ContactData}/>
+                </div>
+            )
+
+        }
+
+        return summary
     }
 }
 
 const mapStateToProps = state => {
     return {
-        reduxIngredients: state.ingredients,
-        // reduxPrice: state.totalPrice,
+        reduxIngredients: state.burgerBuilder.ingredients,
+        isComplete: state.orderState.purchaseComplete,
     }
 }
-
-// Nothing is dispatched, so no mapDispatch...
 
 export default connect(mapStateToProps)(Checkout)

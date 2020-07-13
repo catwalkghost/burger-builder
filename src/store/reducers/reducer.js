@@ -1,4 +1,4 @@
-import * as at from './actions'
+import * as at from '../actions/actions'
 
 const initialState = {
     ingredients: {

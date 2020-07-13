@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
 import { connect } from 'react-redux'
-import * as at from '../../store/actions'
+import * as actionTypes from '../../store/actions/actionTypes'
+import * as actions from '../../store/actions/'
+
+import api from '../../api-orders'
 
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import Aux from '../../hoc/Aux/Aux'
-import api from '../../api-orders'
 
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
@@ -17,7 +19,6 @@ class BurgerBuilder extends Component {
     state = {
         loading: false,
         purchasing: false,
-        error: false,
     }
 
     setPurchasable = () => {
@@ -72,26 +73,29 @@ class BurgerBuilder extends Component {
     // }
 
     continuePurchase = () => {
-        const { history } = this.props
-
+        const { onInitPurchase, history } = this.props
+         onInitPurchase()
         history.push('/checkout')
     }
 
-    // componentDidMount () {
-    //     api.get('/ingredients.json ')
-    //         .then(resp => {
-    //                 const { data } = resp
-    //                 this.setState({ ingredients: data})
-    //             }
-    //         )
-    //         .catch(err => {
-    //             this.setState({error: true})
-    //         })
-    // }
+    componentDidMount () {
+        // api.get('/ingredients.json ')
+        //     .then(resp => {
+        //             const { data } = resp
+        //             this.setState({ ingredients: data})
+        //         }
+        //     )
+        //     .catch(err => {
+        //         this.setState({error: true})
+        //     })
+        const { onInitIngredients } = this.props
+
+        onInitIngredients()
+    }
 
     render () {
         const { purchasing, loading } = this.state
-        const { reduxIngredients, reduxPrice } = this.props
+        const { reduxIngredients, reduxPrice, onAddIngredient, onRemoveIngredient, error } = this.props
 
         const disabledInfo = {
             ...reduxIngredients
@@ -113,15 +117,15 @@ class BurgerBuilder extends Component {
 
         }
 
-        let burger = this.state.error ? <p>Ingredients can't be loaded</p> : <Spinner />
+        let burger = error ? <p>Ingredients can't be loaded</p> : <Spinner />
 
         if (reduxIngredients) {
             burger = (
                 <Aux>
                     <Burger ingredients={reduxIngredients} />
                     <BuildControls
-                        ingredientAdded={this.props.onAddIngredient}
-                        ingredientRemoved={this.props.onRemoveIngredient}
+                        ingredientAdded={onAddIngredient}
+                        ingredientRemoved={onRemoveIngredient}
                         disabled={disabledInfo}
                         purchasable={this.setPurchasable}
                         price={reduxPrice}
@@ -143,28 +147,39 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = state => {
     return {
-        reduxIngredients: state.ingredients,
-        reduxPrice: state.totalPrice,
+        reduxIngredients: state.burgerBuilder.ingredients,
+        reduxPrice: state.burgerBuilder.totalPrice,
+        reduxError: state.burgerBuilder.error,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAddIngredient: (ingName) => dispatch({
-            type: at.ADD_INGREDIENT,
-            payload: {
-                name: ingName,
-            }
-        }),
-
-        onRemoveIngredient: (ingName) => dispatch({
-            type: at.REMOVE_INGREDIENT,
-            payload: {
-                name: ingName,
-            }
-        })
+        onAddIngredient: (ingName) => dispatch(actions.addIngredient(ingName)),
+        onRemoveIngredient: (ingName) => dispatch(actions.removeIngredient(ingName)),
+        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onInitPurchase: () => dispatch(actions.purchaseInit())
     }
 }
+
+// Without action creators
+// const mapDispatchToProps = dispatch => {
+//     return {
+//         onAddIngredient: (ingName) => dispatch({
+//             type: actionTypes.ADD_INGREDIENT,
+//             payload: {
+//                 name: ingName,
+//             }
+//         }),
+//
+//         onRemoveIngredient: (ingName) => dispatch({
+//             type: actionTypes.REMOVE_INGREDIENT,
+//             payload: {
+//                 name: ingName,
+//             }
+//         })
+//     }
+// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, api))
 
