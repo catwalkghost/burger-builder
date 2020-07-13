@@ -23,6 +23,10 @@
     color: #944317;
 }
 
+.default {
+    color: #40A4c8;
+}
+
 .disabled {
     color: #ccc;
     cursor: not-allowed;
