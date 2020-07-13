@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes'
 import * as c from '../const'
-import authApi from '../../api-auth'
+
 import axios from 'axios'
 
 export const authStart = () => {
@@ -9,10 +9,11 @@ export const authStart = () => {
     }
 }
 
-export const authSuccess = (userData) => {
+export const authSuccess = (token, id) => {
     return {
         type: actionTypes.AUTH_SUCCESS,
-        authData: userData,
+        authToken: token,
+        userId: id,
     }
 }
 
@@ -20,6 +21,21 @@ export const authFailed = (err) => {
     return {
         type: actionTypes.AUTH_FAILED,
         error: err,
+    }
+}
+
+export const logOut = () => {
+     return {
+         type: actionTypes.AUTH_LOG_OUT
+     }
+}
+
+export const checkAuthTimeOut = (expiresIn) => {
+    const timeOut = expiresIn * 1000
+    return dispatch => {
+        setTimeout(() => {
+            dispatch(logOut())
+        }, timeOut)
     }
 }
 
@@ -39,13 +55,14 @@ export const authenticate = (email, password, isSignUp) => {
         }
         axios.post(url, authData)
             .then(resp => {
-                const { data } = resp
+                const { data: { idToken, localId, expiresIn } } = resp
                 console.log(resp)
-                dispatch(authSuccess(data))
+                dispatch(authSuccess(idToken, localId))
+                dispatch(checkAuthTimeOut(expiresIn))
             })
             .catch(err => {
                 console.log(err)
-                dispatch(authFailed(err))
+                dispatch(authFailed(err.response.data.error))
             })
     }
 }

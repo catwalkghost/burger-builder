@@ -29,13 +29,13 @@ export const purchaseFailed = (err) => {
 }
 
 // Async using Thunk. Instead of setState use dispatch(actionCreator(args))
-export const purchasing = (orderData) => {
+export const purchasing = (orderData, token) => {
     return dispatch => {
 
         // needs to be dispatched to the store, since loading is set there
         dispatch(purchaseStart())
 
-        api.post('/orders.json', orderData)
+        api.post('/orders.json?auth=' + token, orderData)
             .then(resp => {
                 const { data } = resp
                 console.log(data)
@@ -70,12 +70,11 @@ export const fetchOrdersFailed = (err) => {
 }
 
 // Using Thunk again. Instead of setState use dispatch(actionCreator(args))
-export const fetchOrders = () => {
+export const fetchOrders = (token) => {
+
     return dispatch => {
-
         dispatch(fetchOrdersInit()) // To show the spinner
-
-        api.get('/orders.json')
+        api.get('/orders.json?auth=' + token)
             .then(resp => {
                 const { data } = resp
                 // Converting an object to an array

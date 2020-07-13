@@ -103,7 +103,7 @@ class ContactData extends Component {
     orderHandler = (e) => {
         e.preventDefault()
 
-        const { props: { reduxIngredients, reduxPrice, onOrderBurger }, state: { orderForm } } = this
+        const { props: { reduxIngredients, reduxPrice, onOrderBurger, authToken }, state: { orderForm } } = this
 
         const formData = {}
         for (let formElId in orderForm ) {
@@ -118,7 +118,7 @@ class ContactData extends Component {
         }
 
         // see mapDispatchToProps
-        onOrderBurger(order)
+        onOrderBurger(order, authToken)
     }
 
     inputChangedHandler = (e, inputId) => {
@@ -230,12 +230,13 @@ const mapStateToProps = state => {
         reduxPrice: state.burgerBuilder.totalPrice,
         reduxIngredients: state.burgerBuilder.ingredients,
         reduxLoading: state.orderState.loading,
+        authToken: state.authReducer.token,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderBurger: (orderData) => dispatch(actions.purchasing(orderData))
+        onOrderBurger: (orderData, token) => dispatch(actions.purchasing(orderData, token))
     }
 }
 
