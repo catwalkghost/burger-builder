@@ -9,6 +9,10 @@ import Button from '../../../components/UI/Button/Button'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
+
+import * as actions from '../../../store/actions'
+
 class ContactData extends Component {
 
     state = {
@@ -88,22 +92,18 @@ class ContactData extends Component {
                         { value: 'pick-up', display: 'I\'ll pick up' }
                     ],
                 },
-                value: 'delivery',
+                value: 'delivery', // select needs to have default set explicitly
                 validation: {},
-                // validation: {
-                //     required: true,
-                // },
                 valid: true,
            },
         },
-        loading: false,
         formIsValid: false,
     }
 
     orderHandler = (e) => {
         e.preventDefault()
 
-        const { props: { reduxIngredients, reduxPrice, history }, state: { orderForm } } = this
+        const { props: { reduxIngredients, reduxPrice, onOrderBurger }, state: { orderForm } } = this
 
         const formData = {}
         for (let formElId in orderForm ) {
@@ -111,26 +111,14 @@ class ContactData extends Component {
             formData[formElId] = orderForm[formElId].value
         }
 
-        this.setState({
-            loading: true,
-        })
-        // alert('Checkout')
         const order = {
             ingredients: reduxIngredients,
             price: reduxPrice,
             orderData: formData,
         }
-        api.post('/orders.json', order)
-            .then(resp => {
-                // console.log(resp)
-                this.setState({loading: false })
-                history.push('/')
-            })
-            .catch(err => {
-                console.log(err)
-                this.setState({loading: false })
-            })
-        // console.log(ingredients)
+
+        // see mapDispatchToProps
+        onOrderBurger(order)
     }
 
     inputChangedHandler = (e, inputId) => {
@@ -142,11 +130,12 @@ class ContactData extends Component {
         const updatedOrderForm = {
             ...orderForm
         }
-        // Creating a clone so the state is not mutated
+
         const updatedFormEl = {
             ...updatedOrderForm[inputId]
         }
         updatedFormEl.value = e.target.value
+
         // Checking validity
         updatedFormEl.valid = this.validate(updatedFormEl.value, updatedFormEl.validation) // returns bool
 
@@ -191,7 +180,7 @@ class ContactData extends Component {
     }
 
     render () {
-        const { orderForm, loading, formIsValid } = this.state
+        const { props: { reduxLoading }, state: {orderForm, formIsValid} } = this
         const formElementsArray = []
         for (let key in orderForm) {
             formElementsArray.push({
@@ -203,7 +192,7 @@ class ContactData extends Component {
         return (
             <div className='contact-data'>
                 <h4>Enter Contact Details</h4>
-                {!loading
+                {!reduxLoading
                     ? (<form className='form' onSubmit={this.orderHandler}>
                         {
                             formElementsArray.map(formEl => {
@@ -238,9 +227,16 @@ class ContactData extends Component {
 
 const mapStateToProps = state => {
     return {
-        reduxPrice: state.totalPrice,
-        reduxIngredients: state.ingredients,
+        reduxPrice: state.burgerBuilder.totalPrice,
+        reduxIngredients: state.burgerBuilder.ingredients,
+        reduxLoading: state.orderState.loading,
     }
 }
 
-export default connect(mapStateToProps)(ContactData)
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData) => dispatch(actions.purchasing(orderData))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, api))

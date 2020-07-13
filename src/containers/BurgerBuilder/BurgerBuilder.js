@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import { connect } from 'react-redux'
 import * as actionTypes from '../../store/actions/actionTypes'
-import * as burgerBuilderActions from '../../store/actions/'
+import * as actions from '../../store/actions/'
 
 import api from '../../api-orders'
 
@@ -73,8 +73,8 @@ class BurgerBuilder extends Component {
     // }
 
     continuePurchase = () => {
-        const { history } = this.props
-
+        const { onInitPurchase, history } = this.props
+         onInitPurchase()
         history.push('/checkout')
     }
 
@@ -89,12 +89,13 @@ class BurgerBuilder extends Component {
         //         this.setState({error: true})
         //     })
         const { onInitIngredients } = this.props
+
         onInitIngredients()
     }
 
     render () {
         const { purchasing, loading } = this.state
-        const { reduxIngredients, reduxPrice, error } = this.props
+        const { reduxIngredients, reduxPrice, onAddIngredient, onRemoveIngredient, error } = this.props
 
         const disabledInfo = {
             ...reduxIngredients
@@ -123,8 +124,8 @@ class BurgerBuilder extends Component {
                 <Aux>
                     <Burger ingredients={reduxIngredients} />
                     <BuildControls
-                        ingredientAdded={this.props.onAddIngredient}
-                        ingredientRemoved={this.props.onRemoveIngredient}
+                        ingredientAdded={onAddIngredient}
+                        ingredientRemoved={onRemoveIngredient}
                         disabled={disabledInfo}
                         purchasable={this.setPurchasable}
                         price={reduxPrice}
@@ -146,20 +147,22 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = state => {
     return {
-        reduxIngredients: state.ingredients,
-        reduxPrice: state.totalPrice,
-        reduxError: state.error,
+        reduxIngredients: state.burgerBuilder.ingredients,
+        reduxPrice: state.burgerBuilder.totalPrice,
+        reduxError: state.burgerBuilder.error,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAddIngredient: (ingName) => dispatch(burgerBuilderActions.addIngredient(ingName)),
-        onRemoveIngredient: (ingName) => dispatch(burgerBuilderActions.removeIngredient(ingName)),
-        onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients())
+        onAddIngredient: (ingName) => dispatch(actions.addIngredient(ingName)),
+        onRemoveIngredient: (ingName) => dispatch(actions.removeIngredient(ingName)),
+        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onInitPurchase: () => dispatch(actions.purchaseInit())
     }
 }
 
+// Without action creators
 // const mapDispatchToProps = dispatch => {
 //     return {
 //         onAddIngredient: (ingName) => dispatch({
