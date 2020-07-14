@@ -6,6 +6,7 @@ const initialState = {
     ingredients: null,
     totalPrice: 0.99,
     error: false,
+    building: false,
 }
 
 const INGREDIENT_PRICES = {
@@ -23,6 +24,7 @@ const addIngredient = (state, action) => {
     const updatedState = {
         ingredients: updatedIngredients,
         totalPrice: state.totalPrice + INGREDIENT_PRICES[action.payload.name],
+        building: true,
     }
     return u.updateObject(state, updatedState)
 }
@@ -35,7 +37,8 @@ const removeIngredient = (state, action) => {
     const updatedIngredientsObj = u.updateObject(state.ingredients, updatedIngredient)
     const updatedStateObj = {
         ingredients: updatedIngredientsObj,
-        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.payload.name],
+        totalPrice: state.totalPrice - INGREDIENT_PRICES[action.payload.name],
+        building: true,
     }
 
     return u.updateObject(state, updatedStateObj)
@@ -64,7 +67,8 @@ const setIngredients = (state, action) => {
             meat: meat,
         },
         totalPrice: 0.99,
-        error: false // in case of successful refetch
+        error: false, // in case of successful refetch
+        building: false,
     }
 }
 

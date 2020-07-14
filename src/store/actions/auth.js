@@ -39,6 +39,13 @@ export const checkAuthTimeOut = (expiresIn) => {
     }
 }
 
+export const setAuthRedirect = (path) => {
+    return {
+        type: actionTypes.SET_AUTH_REDIRECT,
+        redirectUrl: path
+    }
+}
+
 export const authenticate = (email, password, isSignUp) => {
     // Thunk
     return dispatch => {
