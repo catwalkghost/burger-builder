@@ -10,17 +10,19 @@ import thunk from 'redux-thunk'
 import './index.css'
 import App from './App'
 
+import authReducer from './store/reducers/auth'
 import burgerBuilder from './store/reducers/burgerBuilder'
 import orderReducer from './store/reducers/order'
 
 import * as serviceWorker from './serviceWorker'
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = process.env.NODE_ENV === 'development' ?  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 // const devTools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 
 const reducers = combineReducers({
     burgerBuilder: burgerBuilder,
-    orderState: orderReducer
+    orderState: orderReducer,
+    authReducer: authReducer,
 })
 
 const store = createStore(reducers, composeEnhancers(applyMiddleware(thunk)))
