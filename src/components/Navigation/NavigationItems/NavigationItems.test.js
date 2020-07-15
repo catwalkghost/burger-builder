@@ -8,9 +8,24 @@ import NavigationItem from './NavigationItem/NavigationItem'
 configure({ adapter: new Adapter() }) // Enzyme connected
 
 describe('NavigationItems', () => {
-    it('should render two nav item elements if not authed', () => {
-        const wrapper = shallow(<NavigationItems />) // passing comp as JSX
+
+    let wrapper
+    beforeEach(() => {
+        wrapper = shallow(<NavigationItems />)
+    })
+
+    it('should render 2x Nav Items if not authed', () => {
         expect(wrapper.find(NavigationItem)) // Not JSX: normal imported function
             .toHaveLength(2) // Find two elements
+    })
+
+    it('should render 3x Nav Items if authed', () => {
+        // const wrapper = shallow(<NavigationItems isAuthenticated />)
+
+        wrapper.setProps({
+            isAuthenticated: true,
+        })
+
+        expect(wrapper.find(NavigationItem)).toHaveLength(3)
     })
 })
