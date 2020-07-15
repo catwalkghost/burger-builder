@@ -25,6 +25,9 @@ export const authFailed = (err) => {
 }
 
 export const logOut = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('expiryDate')
+    localStorage.removeItem('userId')
      return {
          type: actionTypes.AUTH_LOG_OUT
      }
@@ -46,6 +49,38 @@ export const setAuthRedirect = (path) => {
     }
 }
 
+export const authCheckState = () => {
+    return dispatch => { // No Async code, but multiple actions are dispatched
+        const token = localStorage.getItem('token')
+        if (!token) {
+           dispatch(logOut())
+        } else {
+            const expiryDate = new Date(localStorage.getItem('expiryDate'))
+            const localId = localStorage.getItem('userId')
+
+            if (expiryDate > new Date()){
+
+                const timeOutInSeconds = (expiryDate.getTime() - new Date().getTime()) / 1000
+
+                // This can be simply fetched from localStorage,
+                // but for security reasons it's better to make a request to Firebase
+                // const url = c.USER_DATA_URL
+                // axios.post(url, token)
+                //     .then(resp => {
+                //         const {data: {users}} = resp
+                //         console.log(users)
+                //     })
+                dispatch(authSuccess(token, localId))
+                dispatch(checkAuthTimeOut(timeOutInSeconds))
+            } else {
+                dispatch(logOut())
+            }
+
+        }
+
+    }
+}
+
 export const authenticate = (email, password, isSignUp) => {
     // Thunk
     return dispatch => {
@@ -64,6 +99,13 @@ export const authenticate = (email, password, isSignUp) => {
             .then(resp => {
                 const { data: { idToken, localId, expiresIn } } = resp
                 console.log(resp)
+
+                const expiryDate = new Date(new Date().getTime() + expiresIn * 1000)
+
+                localStorage.setItem('token', idToken) // 1st arg: key, 2nd arg: value
+                localStorage.setItem('expiryDate', expiryDate) // 1st arg: key, 2nd arg: value
+                localStorage.setItem('userId', localId)
+
                 dispatch(authSuccess(idToken, localId))
                 dispatch(checkAuthTimeOut(expiresIn))
             })

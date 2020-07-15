@@ -1,7 +1,10 @@
-import React, {Component} from 'react';
-import { Route, Switch } from 'react-router-dom'
+import React, {Component} from 'react'
+import { Route, Switch, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import Layout from './hoc/Layout/Layout'
+
+import * as actions from './store/actions'
 
 import Auth from './containers/Auth/Auth'
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder'
@@ -11,18 +14,10 @@ import LogOut from './containers/Auth/Logout/Logout'
 
 class App extends Component {
 
-    // For debugging
-    // state = {
-    //     show: true,
-    // }
-
-    // componentDidMount () {
-    //     setTimeout(() => {
-    //         this.setState({
-    //             show: false
-    //         })
-    //     }, 5000)
-    // }
+    componentDidMount() {
+        const { onRestoreSession } = this.props
+        onRestoreSession()
+    }
 
     render () {
         return (
@@ -41,4 +36,10 @@ class App extends Component {
     }
 }
 
-export default App;
+const mapDispatchToProps = dispatch => {
+    return {
+        onRestoreSession: () => dispatch(actions.authCheckState())
+    }
+}
+
+export default withRouter(connect(null, mapDispatchToProps)(App))
