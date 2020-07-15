@@ -64,12 +64,7 @@ export const authCheckState = () => {
 
                 // This can be simply fetched from localStorage,
                 // but for security reasons it's better to make a request to Firebase
-                // const url = c.USER_DATA_URL
-                // axios.post(url, token)
-                //     .then(resp => {
-                //         const {data: {users}} = resp
-                //         console.log(users)
-                //     })
+                // Use a refresh token is also an option
                 dispatch(authSuccess(token, localId))
                 dispatch(checkAuthTimeOut(timeOutInSeconds))
             } else {
@@ -98,8 +93,6 @@ export const authenticate = (email, password, isSignUp) => {
         axios.post(url, authData)
             .then(resp => {
                 const { data: { idToken, localId, expiresIn } } = resp
-                console.log(resp)
-
                 const expiryDate = new Date(new Date().getTime() + expiresIn * 1000)
 
                 localStorage.setItem('token', idToken) // 1st arg: key, 2nd arg: value
@@ -110,7 +103,6 @@ export const authenticate = (email, password, isSignUp) => {
                 dispatch(checkAuthTimeOut(expiresIn))
             })
             .catch(err => {
-                console.log(err)
                 dispatch(authFailed(err.response.data.error))
             })
     }

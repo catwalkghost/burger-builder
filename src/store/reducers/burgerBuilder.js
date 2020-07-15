@@ -1,6 +1,6 @@
 import * as actionTypes from '../actions/actionTypes'
 
-import * as u from '../utils'
+import * as u from '../../shared/utils'
 
 const initialState = {
     ingredients: null,

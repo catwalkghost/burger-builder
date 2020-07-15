@@ -12,6 +12,7 @@ import Input from '../../../components/UI/Input/Input'
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
 
 import * as actions from '../../../store/actions'
+import * as u from '../../../shared/utils'
 
 class ContactData extends Component {
 
@@ -103,7 +104,18 @@ class ContactData extends Component {
     orderHandler = (e) => {
         e.preventDefault()
 
-        const { props: { reduxIngredients, reduxPrice, onOrderBurger, authToken }, state: { orderForm } } = this
+        const {
+            props: {
+                reduxIngredients,
+                reduxPrice,
+                onOrderBurger,
+                authToken,
+                reduxUserId
+            },
+            state: {
+                orderForm
+            }
+        } = this
 
         const formData = {}
         for (let formElId in orderForm ) {
@@ -115,6 +127,7 @@ class ContactData extends Component {
             ingredients: reduxIngredients,
             price: reduxPrice,
             orderData: formData,
+            userId: reduxUserId,
         }
 
         // see mapDispatchToProps
@@ -123,24 +136,17 @@ class ContactData extends Component {
 
     inputChangedHandler = (e, inputId) => {
 
-        // console.log(e.target.value)
         const { orderForm } = this.state
 
-        // Creating a clone so the state is not mutated
-        const updatedOrderForm = {
-            ...orderForm
-        }
+        const updatedFormEl = u.updateObject(orderForm[inputId], {
+                value: e.target.value,
+                valid: u.validate(e.target.value, orderForm[inputId].validation), // returns bool
+                touched: true,
+            })
 
-        const updatedFormEl = {
-            ...updatedOrderForm[inputId]
-        }
-        updatedFormEl.value = e.target.value
-
-        // Checking validity
-        updatedFormEl.valid = this.validate(updatedFormEl.value, updatedFormEl.validation) // returns bool
-
-        updatedFormEl.touched = true
-        updatedOrderForm[inputId] = updatedFormEl
+        const updatedOrderForm = u.updateObject(orderForm, {
+            [inputId]: updatedFormEl
+        })
 
         let formIsValid = true
         for (let inputIds in updatedOrderForm) {
@@ -151,32 +157,6 @@ class ContactData extends Component {
             orderForm: updatedOrderForm,
             formIsValid: formIsValid,
         })
-    }
-
-    validate = (value, rules) => {
-        // needed so all validation rules are checked
-        let isValid = true
-
-        // returns true if no validation rules are defined
-        if (!rules) {
-            return true
-        }
-
-        if (rules.required ) {
-            // Checks if not an empty string
-             isValid = value.trim() !== '' &&isValid
-        }
-
-        if (rules.minLength) {
-            // Checks min length
-            isValid = value.length >= rules.minLength &&isValid
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength &&isValid
-        }
-
-        return isValid
     }
 
     render () {
@@ -231,6 +211,7 @@ const mapStateToProps = state => {
         reduxIngredients: state.burgerBuilder.ingredients,
         reduxLoading: state.orderState.loading,
         authToken: state.authReducer.token,
+        reduxUserId: state.authReducer.userId,
     }
 }
 

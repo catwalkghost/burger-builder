@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import './Auth.css'
 
 import * as actions from '../../store/actions'
+import * as u from '../../shared/utils'
 
 import Spinner from '../../components/UI/Spinner/Spinner'
 import Button from '../../components/UI/Button/Button'
@@ -47,54 +48,33 @@ class Auth extends Component {
         signUp: true,
     }
 
-
-    validate(value, rules) {
-        let isValid = true
-
-        if (!rules) {
-            return true
-        }
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        // if (rules.isNumeric) {
-        //     const pattern = /^\d+$/;
-        //     isValid = pattern.test(value) && isValid
-        // }
-
-        return isValid
-    }
-
     inputChangedHandler = (e, controlName) => {
         const { controls } = this.state
-        const updatedControls = {
-            ...controls,
-            // Updates only ONE control
-            [controlName]: {
-                ...controls[controlName],
+        // const updatedControls = {
+        //     ...controls,
+        //     // Updates only ONE control
+        //     [controlName]: {
+        //         ...controls[controlName],
+        //         value: e.target.value,
+        //         valid: this.validate(
+        //             e.target.value,
+        //             controls[controlName].validation
+        //         ),
+        //         touched: true
+        //     }
+        // }
+
+        const updatedControls = u.updateObject(controls, {
+            [controlName]: u.updateObject(controls[controlName], {
                 value: e.target.value,
-                valid: this.validate(
+                valid: u.validate(
                     e.target.value,
                     controls[controlName].validation
                 ),
-                touched: true
-            }
-        }
+                touched: true,
+            })
+        })
+
         this.setState({
             controls: updatedControls
         })
@@ -179,9 +159,6 @@ class Auth extends Component {
         if (reduxIsAuthed) {
             authRedirect = <Redirect to={reduxAuthRedirect} />
         }
-
-
-
 
         return (
             <div className='auth'>

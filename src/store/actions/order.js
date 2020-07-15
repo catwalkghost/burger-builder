@@ -70,11 +70,19 @@ export const fetchOrdersFailed = (err) => {
 }
 
 // Using Thunk again. Instead of setState use dispatch(actionCreator(args))
-export const fetchOrders = (token) => {
+export const fetchOrders = (token, userId) => {
 
     return dispatch => {
         dispatch(fetchOrdersInit()) // To show the spinner
-        api.get('/orders.json?auth=' + token)
+
+        const queryParams =
+            '?auth='
+            + token
+            + '&orderBy="userId"&equalTo="'
+            + userId // getState() can also be used here
+            + '"'
+
+        api.get('/orders.json' + queryParams)
             .then(resp => {
                 const { data } = resp
                 // Converting an object to an array

@@ -1,16 +1,27 @@
 import React, {Component} from 'react'
-import { Route, Switch, withRouter } from 'react-router-dom'
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import lazyLoad from './hoc/lazyLoad/lazyLoad'
 import Layout from './hoc/Layout/Layout'
 
 import * as actions from './store/actions'
 
-import Auth from './containers/Auth/Auth'
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder'
-import Checkout from './containers/Checkout/Checkout'
-import Orders from './containers/Orders/Orders'
 import LogOut from './containers/Auth/Logout/Logout'
+
+const lazyLoadAuth = lazyLoad(() => {
+    return import('./containers/Auth/Auth')
+})
+
+const lazyLoadCheckout = lazyLoad(() => {
+    return import('./containers/Checkout/Checkout')
+})
+
+const lazyLoadOrders = lazyLoad(() => {
+    return import('./containers/Orders/Orders')
+})
+
 
 class App extends Component {
 
@@ -20,20 +31,46 @@ class App extends Component {
     }
 
     render () {
+
+        const { reduxIsAuthed } = this.props
+
+        let routes = (
+            <Switch>
+                <Route path='/auth' component={lazyLoadAuth} />
+                <Route path='/' exact component={BurgerBuilder} />
+                {/* redirect for unknown pages */}
+                <Redirect to='/' />
+            </Switch>
+        )
+
+        if (reduxIsAuthed) {
+            routes = (
+                <Switch>
+                    <Route path='/checkout' component={lazyLoadCheckout} />
+                    <Route path='/my-orders' component={lazyLoadOrders} />
+                    <Route path='/logout' component={LogOut} />
+                    <Route path='/auth' component={lazyLoadAuth} />
+                    <Route path='/' exact component={BurgerBuilder} />
+                    {/* redirect for unknown pages */}
+                    <Redirect to='/' />
+                </Switch>
+            )
+        }
+        
         return (
             <div>
                 <Layout>
-                    <Switch>
-                        <Route path='/checkout' component={Checkout} />
-                        <Route path='/my-orders' component={Orders} />
-                        <Route path='/auth' component={Auth} />
-                        <Route path='/logout' component={LogOut} />
-                        <Route path='/' exact component={BurgerBuilder} />
-                    </Switch>
+                    {routes}
                 </Layout>
             </div>
         )
     }
+}
+
+const mapStateToProps = state => {
+     return {
+         reduxIsAuthed: state.authReducer.token !== null,
+     }
 }
 
 const mapDispatchToProps = dispatch => {
@@ -42,4 +79,4 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-export default withRouter(connect(null, mapDispatchToProps)(App))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
